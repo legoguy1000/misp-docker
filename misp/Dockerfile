@@ -34,12 +34,17 @@ RUN git checkout tags/${MISP_TAG} && \
     git submodule update --init --recursive && \
     git submodule foreach --recursive git config core.filemode false && \
     virtualenv -p python3 ${PATH_TO_MISP}/venv && \
-    ${PATH_TO_MISP}/venv/bin/pip3 install git+https://github.com/STIXProject/python-stix.git \
-                 git+https://github.com/CybOXProject/python-cybox.git \
-                 git+https://github.com/CybOXProject/mixbox.git \
-                 git+https://github.com/MAECProject/python-maec.git \
+    ${PATH_TO_MISP}/venv/bin/pip3 install \
+                #  git+https://github.com/STIXProject/python-stix.git \
+                #  git+https://github.com/CybOXProject/python-cybox.git \
+                #  git+https://github.com/CybOXProject/mixbox.git \
+                #  git+https://github.com/MAECProject/python-maec.git \
                  git+https://github.com/kbandla/pydeep.git \
-                 ${PATH_TO_MISP}/cti-python-stix2 \
+                 ${PATH_TO_MISP}/app/files/scripts/python-stix \
+                 ${PATH_TO_MISP}/app/files/scripts/python-maec \
+                 ${PATH_TO_MISP}/app/files/scripts/mixbox \
+                 ${PATH_TO_MISP}/app/files/scripts/python-cybox \
+                 ${PATH_TO_MISP}/app/files/scripts/cti-python-stix2 \
                  ${PATH_TO_MISP}/PyMISP \
                  setuptools plyara python-magic lxml lief redis pyzmq mail-parser ssdeep && \
     git submodule init && git submodule update

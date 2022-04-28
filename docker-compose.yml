@@ -1,11 +1,13 @@
 version: '3'
 services:
-  web:
+  misp:
     depends_on:
       - db
       - redis
-    container_name: misp_web
-    image: misp:2.4.148
+    image: misp:2.4.158
+    build:
+      context: misp
+      dockerfile: ./Dockerfile
     # entrypoint: sleep 5h
     restart: unless-stopped
     ports:
@@ -45,7 +47,6 @@ services:
       - SETTING_Security_disable_browser_cache=true
       - SETTING_Security_check_sec_fetch_site_header=true
   db:
-    container_name: misp_db
     image: mariadb:latest
     restart: unless-stopped
     environment:
@@ -54,12 +55,13 @@ services:
       - MYSQL_PASSWORD=asdfasdfasdf
       - MYSQL_ROOT_PASSWORD=asdfasdfasdf
   redis:
-    container_name: misp_redis
     image: "redis:latest"
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
   misp_modules:
-    container_name: misp_modules
-    image: misp-modules:2.4.148
+    image: misp-modules:2.4.157
+    build:
+      context: misp-modules
+      dockerfile: ./Dockerfile
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
