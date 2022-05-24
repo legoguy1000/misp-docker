@@ -1,4 +1,4 @@
-FROM python:3.8-buster AS build
+FROM python:3.10-buster AS build
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV WORKDIR="/usr/local/src/misp_modules"
@@ -8,7 +8,7 @@ ARG MISP_MODULES_TAG=v${MISP_MODULES_VERSION}
 ARG MAXMIND_API_KEY
 
 # Install Packages for build
-RUN set -eu && mkdir -p ${WORKDIR} ${VENV_DIR} && apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends && \
+RUN set -eu && mkdir -p ${WORKDIR} ${VENV_DIR} && apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     git libpq5 libjpeg-dev tesseract-ocr libpoppler-cpp-dev imagemagick virtualenv libopencv-dev \
     zbar-tools libzbar0 libzbar-dev libfuzzy-dev curl && \
     apt-get -y autoremove && apt-get -y clean && rm -rf /var/lib/apt/lists/*
@@ -31,7 +31,7 @@ RUN     set -o pipefail && git checkout tags/${MISP_MODULES_TAG} && ${VENV_DIR}/
 #########################################
 # Start Final Docker Image
 #
-FROM python:3.8-slim-buster AS final
+FROM python:3.10-slim-buster AS final
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV VENV_DIR="/misp_modules"
