@@ -14,9 +14,9 @@ RUN set -eu && mkdir -p ${WORKDIR} ${VENV_DIR} && apt-get update && apt-get upgr
     apt-get -y autoremove && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # Create MISP Modules
-RUN set -eu && git clone https://github.com/MISP/misp-modules.git ${WORKDIR} && virtualenv -p python3 ${VENV_DIR}/venv
+RUN set -eu && git clone https://github.com/MISP/misp-modules.git ${WORKDIR} && python -m pip install --upgrade pip virtualenv && virtualenv -p python3 ${VENV_DIR}/venv
 WORKDIR ${WORKDIR}
-RUN     set -o pipefail && git checkout tags/${MISP_MODULES_TAG} && ${VENV_DIR}/venv/bin/pip3 install -I -r REQUIREMENTS --no-cache-dir && \
+RUN     git checkout tags/${MISP_MODULES_TAG} && ${VENV_DIR}/venv/bin/pip3 install -I -r REQUIREMENTS --no-cache-dir && \
         ${VENV_DIR}/venv/bin/pip3 install . --no-cache-dir && \ 
         ${VENV_DIR}/venv/bin/pip3 install git+https://github.com/abenassi/Google-Search-API socialscan dnsdb2 censys pyfaup && \
         curl -L -o /tmp/GeoLite2-ASN.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${MAXMIND_API_KEY}&suffix=tar.gz"  && \
