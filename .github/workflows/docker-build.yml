@@ -1,0 +1,28 @@
+name: Build container images
+on:
+  push:
+    branches:
+      - '*'
+jobs:
+  build-misp:
+    name: Build MISP Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.10.0
+        with:
+          context: "./misp"
+          push: false
+  build-misp-modules:
+    name: Build MISP Modules Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.10.0
+        with:
+          context: "./misp-modules"
+          push: false
+          build-args: |
+            MAXMIND_API_KEY=${{ secrets.MAXMIND_API_KEY }}
