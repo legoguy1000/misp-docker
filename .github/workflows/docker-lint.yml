@@ -1,6 +1,8 @@
 name: Lint container images
 on:
   push:
+    branches:
+      - '*'
 jobs:
   misp-lint:
     name: Lint MISP Docker Image
