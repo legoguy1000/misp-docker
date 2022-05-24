@@ -12,7 +12,7 @@ jobs:
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: ./misp/Dockerfile
-          ignore: DL3008
+          ignore: DL3008,DL4006,SC3040
   misp-modules-lint:
     name: Lint MISP Modules Docker Image
     runs-on: ubuntu-latest
@@ -22,3 +22,4 @@ jobs:
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: ./misp-modules/Dockerfile
+          ignore: DL3008,DL4006,SC3040
