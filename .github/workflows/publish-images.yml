@@ -1,9 +1,14 @@
 name: Build and Publish container images
 on:
-  release:
-    types: [published]
+  branches:
+    - main
 env:
   REGISTRY: ghcr.io
+  MISP_VERSION: 2.4.158
+  MISP_MODULES_VERSION: 2.4.157
+permissions:
+  packages: write
+  contents: read
 jobs:
   build-misp:
     name: Build MISP Image
@@ -20,7 +25,9 @@ jobs:
         with:
           context: "./misp"
           push: true
-          tags: ${{ env.REGISTRY }}/legoguy1000/misp:${{ github.event.release.tag_name }}
+          tags: ${{ env.REGISTRY }}/legoguy1000/misp:${{ env.MISP_VERSION }}
+          build-args: |
+            MISP_VERSION=${{ env.MISP_VERSION }}
   build-misp-modules:
     name: Build MISP Modules Image
     runs-on: ubuntu-latest
@@ -36,6 +43,7 @@ jobs:
         with:
           context: "./misp-modules"
           push: true
-          tags: ${{ env.REGISTRY }}/legoguy1000/misp-modules:${{ github.event.release.tag_name }}
+          tags: ${{ env.REGISTRY }}/legoguy1000/misp-modules:${{ env.MISP_MODULES_VERSION }}
           build-args: |
             MAXMIND_API_KEY=${{ secrets.MAXMIND_API_KEY }}
+            MISP_MODULES_VERSION=${{ env.MISP_MODULES_VERSION }}
