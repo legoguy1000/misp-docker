@@ -4,6 +4,9 @@ on:
     types: [published]
 env:
   REGISTRY: ghcr.io
+permissions:
+  packages: write
+  contents: read
 jobs:
   build-misp:
     name: Build MISP Image
