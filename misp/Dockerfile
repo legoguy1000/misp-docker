@@ -10,7 +10,7 @@ ENV LANG en_US.UTF-8
 ENV PATH_TO_MISP /var/www/MISP
 
 # Apache and PHP 7.4 and install MySQL PDO extension
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     apache2 apache2-doc apache2-utils libapache2-mod-shib libapache2-mod-php php php-dev php-cli php-json php-zip php-intl php-apcu \
     php-mysql php-redis php-gnupg php-xml php-mbstring php-gd php-pear php-opcache php-curl php-readline pkg-config php-bcmath libbson-1.0 libmongoc-1.0-0 \
     python3 python3-dev python3-pip python3-virtualenv libjpeg-dev libxml2-dev libxslt1-dev zlib1g-dev libfuzzy-dev cron logrotate \
@@ -50,7 +50,8 @@ RUN git checkout tags/${MISP_TAG} && \
                  setuptools plyara python-magic lxml lief redis pyzmq mail-parser ssdeep && \
     git submodule init && git submodule update
 
-RUN cd /tmp && curl -o ssdeep-2.14.1.tar.gz -L https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
+WORKDIR /tmp
+RUN set -euo pipefail && curl -o ssdeep-2.14.1.tar.gz -L https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
     tar zxvf ssdeep-2.14.1.tar.gz && cd ssdeep-2.14.1 && ./configure && make && make install && pecl install ssdeep && \
     echo 'extension=ssdeep.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini && phpenmod ssdeep && rm -rf /tmp/ssdeep* /tmp/pear
 

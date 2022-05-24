@@ -8,32 +8,24 @@ ARG MISP_MODULES_TAG=v${MISP_MODULES_VERSION}
 ARG MAXMIND_API_KEY
 
 # Install Packages for build
-RUN set -eu \
-        ;mkdir -p ${WORKDIR} ${VENV_DIR} \
-        ;apt-get update && apt-get install -y --no-install-recommends \
-         git libpq5 libjpeg-dev tesseract-ocr \
-         libpoppler-cpp-dev imagemagick virtualenv libopencv-dev \
-         zbar-tools libzbar0 libzbar-dev libfuzzy-dev \
-        ;apt-get -y autoremove \
-        ;apt-get -y clean \
-        ;rm -rf /var/lib/apt/lists/*
+RUN set -eu && mkdir -p ${WORKDIR} ${VENV_DIR} && apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends && \
+    git libpq5 libjpeg-dev tesseract-ocr libpoppler-cpp-dev imagemagick virtualenv libopencv-dev \
+    zbar-tools libzbar0 libzbar-dev libfuzzy-dev curl && \
+    apt-get -y autoremove && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # Create MISP Modules
-RUN set -eu \
-        ;git clone https://github.com/MISP/misp-modules.git ${WORKDIR} \
-        ;virtualenv -p python3 ${VENV_DIR}/venv \
-        ;cd ${WORKDIR} \
-        ;git checkout tags/${MISP_MODULES_TAG} \
-        ;${VENV_DIR}/venv/bin/pip3 install -I -r REQUIREMENTS --no-cache-dir \
-        ;${VENV_DIR}/venv/bin/pip3 install . --no-cache-dir \
-        ;${VENV_DIR}/venv/bin/pip3 install git+https://github.com/abenassi/Google-Search-API socialscan dnsdb2 censys pyfaup \
-        ;curl -L -o /tmp/GeoLite2-ASN.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${MAXMIND_API_KEY}&suffix=tar.gz" \
-        ;curl -L -o /tmp/GeoLite2-City.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${MAXMIND_API_KEY}&suffix=tar.gz" \
-        ;curl -L -o /tmp/GeoLite2-Country.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${MAXMIND_API_KEY}&suffix=tar.gz" \
-        ;mkdir -p /tmp/geoip \
-        ;tar -ztf /tmp/GeoLite2-ASN.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-ASN.tar.gz X >> /tmp/geoip/GeoLite2-ASN.mmdb \
-        ;tar -ztf /tmp/GeoLite2-City.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-City.tar.gz X >> /tmp/geoip/GeoLite2-City.mmdb \
-        ;tar -ztf /tmp/GeoLite2-Country.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-Country.tar.gz X >> /tmp/geoip/GeoLite2-Country.mmdb
+RUN set -eu && git clone https://github.com/MISP/misp-modules.git ${WORKDIR} && virtualenv -p python3 ${VENV_DIR}/venv
+WORKDIR ${WORKDIR}
+RUN     git checkout tags/${MISP_MODULES_TAG} && ${VENV_DIR}/venv/bin/pip3 install -I -r REQUIREMENTS --no-cache-dir && \
+        ${VENV_DIR}/venv/bin/pip3 install . --no-cache-dir && \ 
+        ${VENV_DIR}/venv/bin/pip3 install git+https://github.com/abenassi/Google-Search-API socialscan dnsdb2 censys pyfaup && \
+        curl -L -o /tmp/GeoLite2-ASN.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${MAXMIND_API_KEY}&suffix=tar.gz"  && \
+        curl -L -o /tmp/GeoLite2-City.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${MAXMIND_API_KEY}&suffix=tar.gz" && \
+        curl -L -o /tmp/GeoLite2-Country.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${MAXMIND_API_KEY}&suffix=tar.gz" && \
+        mkdir -p /tmp/geoip && \
+        tar -ztf /tmp/GeoLite2-ASN.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-ASN.tar.gz X >> /tmp/geoip/GeoLite2-ASN.mmdb && \
+        tar -ztf /tmp/GeoLite2-City.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-City.tar.gz X >> /tmp/geoip/GeoLite2-City.mmdb && \
+        tar -ztf /tmp/GeoLite2-Country.tar.gz | grep mmdb | xargs -I X tar -Ozxf /tmp/GeoLite2-Country.tar.gz X >> /tmp/geoip/GeoLite2-Country.mmdb
 
 
 #########################################
@@ -57,15 +49,9 @@ COPY files/healthcheck.sh /healthcheck.sh
 HEALTHCHECK --interval=1m --timeout=45s --retries=3 CMD ["/healthcheck.sh"]
 
 # Install Packages to run it
-RUN set -eu \
-    ;apt-get update && apt-get install -y --no-install-recommends \
-        curl libpq5 tesseract-ocr libpoppler-cpp-dev imagemagick \
-        zbar-tools libzbar0 libgl1-mesa-glx \
-    ;apt-get -y autoremove \
-    ;apt-get -y clean \
-    ;rm -rf /var/lib/apt/lists/* \
-    ;chown -R nobody ${VENV_DIR} /entrypoint.sh /healthcheck.sh \
-    ;chmod +x /entrypoint.sh /healthcheck.sh
+RUN set -eu && apt-get update && apt-get install -y --no-install-recommends curl libpq5 tesseract-ocr libpoppler-cpp-dev imagemagick \
+    zbar-tools libzbar0 libgl1-mesa-glx && apt-get -y autoremove && apt-get -y clean && rm -rf /var/lib/apt/lists/* && \
+    chown -R nobody ${VENV_DIR} /entrypoint.sh /healthcheck.sh && chmod +x /entrypoint.sh /healthcheck.sh
 
 
 # Change Workdir
