@@ -4,15 +4,16 @@
 
 set -e
 
+export PATH_TO_MISP=/var/www/MISP
 if [ -r /tmp/.firstboot.tmp ]; then
     echo "Container started for the fist time. Setup might time a few minutes. Please wait..."
     echo "(Details are logged in /tmp/install.log)"
     export DEBIAN_FRONTEND=noninteractive
 
     # If the user uses a mount point restore our files
-    if [ ! -f /var/www/MISP/app/Config/config.php ]; then
+    if [ ! -f ${PATH_TO_MISP}/app/Config/config.php ]; then
         echo "Restoring MISP Config files..."
-        cd /var/www/MISP/app/Config
+        cd ${PATH_TO_MISP}/app/Config
         tar xzpf /tmp/MISPconfig.tgz
         rm /tmp/MISPconfig.tgz
     fi
@@ -57,11 +58,11 @@ if [ -r /tmp/.firstboot.tmp ]; then
         echo 'Database Exists'
     else
         echo 'Initializing DB'
-        mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DATABASE < /var/www/MISP/INSTALL/MYSQL.sql
+        mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DATABASE < ${PATH_TO_MISP}/INSTALL/MYSQL.sql
         if [ $? -eq 0 ]; then
-            echo "Imported /var/www/MISP/INSTALL/MYSQL.sql successfully"
+            echo "Imported ${PATH_TO_MISP}/INSTALL/MYSQL.sql successfully"
         else
-            echo "ERROR: Importing /var/www/MISP/INSTALL/MYSQL.sql failed:"
+            echo "ERROR: Importing ${PATH_TO_MISP}/INSTALL/MYSQL.sql failed:"
             echo $ret
         fi
     fi
@@ -71,7 +72,7 @@ if [ -r /tmp/.firstboot.tmp ]; then
             echo "INFO - Not using external config for MISP"
     else
         echo "INFO - Using external config file for MISP"
-        cp -f $EXTERNAL_CONFIG /var/www/MISP/app/Config/config.external.php
+        cp -f $EXTERNAL_CONFIG ${PATH_TO_MISP}/app/Config/config.external.php
         echo "include 'config.external.php';" >> config.php
         echo "" >> config.php
     fi
@@ -81,11 +82,10 @@ if [ -r /tmp/.firstboot.tmp ]; then
             echo "INFO - Not using external bootstrap for MISP"
     else
         echo "INFO - Using external bootstrap file for MISP"
-        cp -f $EXTERNAL_BOOTSRAP /var/www/MISP/app/Config/bootstrap.external.php
+        cp -f $EXTERNAL_BOOTSRAP ${PATH_TO_MISP}/app/Config/bootstrap.external.php
         echo "include 'bootstrap.external.php';" >> bootstrap.php
         echo "" >> bootstrap.php
     fi
-    /var/www/MISP/app/Console/cake userInit -q
 
     # Generate the admin user PGP key
     echo "Creating admin GnuPG key"
@@ -104,17 +104,27 @@ Passphrase: $MISP_ADMIN_PASSPHRASE
 %commit
 %echo Done
 GPGEOF
-    sudo -u www-data gpg --homedir /var/www/MISP/.gnupg --gen-key --batch /tmp/gpg.tmp >>/tmp/install.log
+    sudo -u www-data gpg --homedir ${PATH_TO_MISP}/.gnupg --gen-key --batch /tmp/gpg.tmp >>/tmp/install.log
     rm -f /tmp/gpg.tmp
-    sudo -u www-data gpg --homedir /var/www/MISP/.gnupg --export --armor $MISP_ADMIN_EMAIL > /var/www/MISP/app/webroot/gpg.asc
+    sudo -u www-data gpg --homedir ${PATH_TO_MISP}/.gnupg --export --armor $MISP_ADMIN_EMAIL > ${PATH_TO_MISP}/app/webroot/gpg.asc
     fi
-    export CAKE=/var/www/MISP/app/Console/cake
+    export CAKE="${PATH_TO_MISP}/app/Console/cake"
+
     $CAKE userInit -q
-    $CAKE Admin setSetting "MISP.python_bin" "/var/www/MISP/venv/bin/python3"
+    $CAKE Admin runUpdates
+    $CAKE Admin setSetting "MISP.python_bin" "${PATH_TO_MISP}/venv/bin/python3"
     $CAKE Admin setSetting "MISP.redis_host" "${REDIS_HOST:=localhost}"
     $CAKE Admin setSetting "MISP.redis_port" "${REDIS_PORT:=6379}"
     $CAKE Admin setSetting "MISP.redis_password" "${REDIS_PASSWORD:=}"
     $CAKE Admin setSetting "Security.salt" $(openssl rand -base64 32|tr "/" "-")
+    $CAKE Admin setSetting "MISP.tmpdir" "${PATH_TO_MISP}/app/tmp"
+    $CAKE Admin setSetting "GnuPG.homedir"  "${PATH_TO_MISP}/.gnupg"
+    # $CAKE Admin setSetting "Security.encryption_key" 
+    # Change base url, either with this CLI command or in the UI
+    [[ ! -z ${MISP_BASEURL} ]] && ${CAKE} Baseurl $MISP_BASEURL
+    # The base url of the application (in the format https://www.mymispinstance.com) as visible externally/by other MISPs.
+    # MISP will encode this URL in sharing groups when including itself. If this value is not set, the baseurl is used as a fallback.
+    [[ ! -z ${MISP_BASEURL} ]] && ${CAKE} Admin setSetting "MISP.external_baseurl" ${MISP_BASEURL}
 
     if [ -z "$MISP_MODULES_URL" ] || [ -z "$MISP_MODULES_PORT" ]; then
         echo "MISP Modules ENV Variables not set properly.  Skipping."
@@ -172,8 +182,8 @@ __WELCOME__
     rm -f /tmp/.firstboot.tmp
 fi
 
-chown www-data:www-data /var/www/MISP/app/Config/config.php*
+chown www-data:www-data ${PATH_TO_MISP}/app/Config/config.php*
 echo "Starting MISP"
-/var/www/MISP/app/Console/worker/start.sh
+${PATH_TO_MISP}/app/Console/worker/start.sh
 service shibd start
 source /etc/apache2/envvars && exec /usr/sbin/apache2 -D FOREGROUND

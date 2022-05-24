@@ -11,10 +11,10 @@ ENV PATH_TO_MISP /var/www/MISP
 
 # Apache and PHP 7.4 and install MySQL PDO extension
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends \
-    apache2 apache2-doc apache2-utils libapache2-mod-shib libapache2-mod-php php php-dev php-json php-zip php-intl \
-    php-mysql php-redis php-xml php-mbstring php-gd php-pear php-opcache php-curl pkg-config php-bcmath libbson-1.0 libmongoc-1.0-0 \
+    apache2 apache2-doc apache2-utils libapache2-mod-shib libapache2-mod-php php php-dev php-cli php-json php-zip php-intl php-apcu \
+    php-mysql php-redis php-gnupg php-xml php-mbstring php-gd php-pear php-opcache php-curl php-readline pkg-config php-bcmath libbson-1.0 libmongoc-1.0-0 \
     python3 python3-dev python3-pip python3-virtualenv libjpeg-dev libxml2-dev libxslt1-dev zlib1g-dev libfuzzy-dev cron logrotate \
-    gcc make software-properties-common mariadb-client curl git gnupg-agent openssl zip locales \
+    gcc make software-properties-common mariadb-client curl git gnupg-agent openssl zip locales supervisor \
     libpoppler97 libpoppler-dev libpoppler-cpp-dev g++ && apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/* && \
     a2dismod status && a2dissite 000-default && locale-gen en_US.UTF-8 && phpenmod redis && \
     sed -i \
@@ -40,6 +40,7 @@ RUN git checkout tags/${MISP_TAG} && \
                 #  git+https://github.com/CybOXProject/mixbox.git \
                 #  git+https://github.com/MAECProject/python-maec.git \
                  git+https://github.com/kbandla/pydeep.git \
+                 ${PATH_TO_MISP}/app/files/scripts/misp-stix \
                  ${PATH_TO_MISP}/app/files/scripts/python-stix \
                  ${PATH_TO_MISP}/app/files/scripts/python-maec \
                  ${PATH_TO_MISP}/app/files/scripts/mixbox \
@@ -57,13 +58,13 @@ WORKDIR ${PATH_TO_MISP}/app
 
 # FIX COMPOSER
 RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer && php composer-setup.php && php -r "unlink('composer-setup.php');" && \
-    php composer.phar update &&  php composer.phar config vendor-dir Vendor &&  php composer.phar install --ignore-platform-reqs && \
+    php composer.phar update &&  php composer.phar config vendor-dir Vendor &&  php composer.phar install --ignore-platform-reqs --no-dev && \
     cp -fa ${PATH_TO_MISP}/INSTALL/setup/config.php ${PATH_TO_MISP}/app/Plugin/CakeResque/Config/config.php && \
     cp ${PATH_TO_MISP}/INSTALL/misp.logrotate /etc/logrotate.d/misp
 
 # Apache Setup
 RUN cp ${PATH_TO_MISP}/INSTALL/apache.misp.ubuntu /etc/apache2/sites-available/misp.conf && \
-    a2dissite 000-default && a2ensite misp && a2enmod rewrite headers ssl shib
+    a2dissite 000-default default-ssl && a2ensite misp && a2enmod rewrite headers ssl shib
 
 # MISP base configuration
 RUN cp -a ${PATH_TO_MISP}/app/Config/bootstrap.default.php ${PATH_TO_MISP}/app/Config/bootstrap.php && \
@@ -101,8 +102,9 @@ RUN chmod 0755 /run_misp.sh && touch /tmp/.firstboot.tmp && chown -R www-data:ww
 WORKDIR ${PATH_TO_MISP}/app/Config
 RUN tar czpf /tmp/MISPconfig.tgz .
 
-RUN chown -R www-data:www-data ${PATH_TO_MISP} /tmp/MISPconfig.tgz && chmod -R 775 ${PATH_TO_MISP} /tmp/MISPconfig.tgz && mkdir -p /run/shibboleth && \
-    chown -R www-data:www-data /run/shibboleth /var/log/shibboleth /var/run/shibboleth && \
+RUN chown -R www-data:www-data ${PATH_TO_MISP} /tmp/MISPconfig.tgz && chmod -R 750 ${PATH_TO_MISP} /tmp/MISPconfig.tgz && \
+    chmod -R g+ws ${PATH_TO_MISP}/app/tmp && chmod -R g+ws ${PATH_TO_MISP}/app/files && chmod -R g+ws ${PATH_TO_MISP}/app/files/scripts/tmp && \    
+    mkdir -p /run/shibboleth && chown -R www-data:www-data /run/shibboleth /var/log/shibboleth /var/run/shibboleth && \
     chmod -R 775 /run/shibboleth /var/log/shibboleth /var/run/shibboleth
 
 HEALTHCHECK --timeout=15s CMD curl http://localhost:8080/

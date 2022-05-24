@@ -1,0 +1,23 @@
+name: docker-lint
+on:
+  push:
+  # pull_request:
+jobs:
+  misp-lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Hadolint Action
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ./misp/Dockerfile
+  misp-modules-lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Hadolint Action
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ./misp-modules/Dockerfile

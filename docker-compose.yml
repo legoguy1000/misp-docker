@@ -20,7 +20,7 @@ services:
       - MYSQL_HOST=db
       - MYSQL_DATABASE=misp
       - MYSQL_USER=misp
-      - MYSQL_PASSWORD=asdfasdfasdf
+      - MYSQL_PASSWORD=pAyRGUTvaqx?7!gd5Yr#
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MISP_MODULES_URL=misp_modules
@@ -52,16 +52,16 @@ services:
     environment:
       - MYSQL_DATABASE=misp
       - MYSQL_USER=misp
-      - MYSQL_PASSWORD=asdfasdfasdf
-      - MYSQL_ROOT_PASSWORD=asdfasdfasdf
+      - MYSQL_PASSWORD=pAyRGUTvaqx?7!gd5Yr#
+      - MYSQL_ROOT_PASSWORD=*7Adrq^a8D5&ALtbcwM?
   redis:
     image: "redis:latest"
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
-  misp_modules:
-    image: misp-modules:2.4.157
-    build:
-      context: misp-modules
-      dockerfile: ./Dockerfile
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
+  # misp_modules:
+  #   image: misp-modules:2.4.157
+  #   build:
+  #     context: misp-modules
+  #     dockerfile: ./Dockerfile
+  #   restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+  #   stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
