@@ -51,8 +51,10 @@ RUN git checkout tags/${MISP_TAG} && \
     git submodule init && git submodule update
 
 WORKDIR /tmp
-RUN set -euo pipefail && curl -o ssdeep-2.14.1.tar.gz -L https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
-    tar zxvf ssdeep-2.14.1.tar.gz && cd ssdeep-2.14.1 && ./configure && make && make install && pecl install ssdeep && \
+RUN curl -o ssdeep-2.14.1.tar.gz -L https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
+    tar zxvf ssdeep-2.14.1.tar.gz
+WORKDIR  /tmp/ssdeep-2.14.1
+RUN set -euo pipefail && ./configure && make && make install && pecl install ssdeep && \
     echo 'extension=ssdeep.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini && phpenmod ssdeep && rm -rf /tmp/ssdeep* /tmp/pear
 
 WORKDIR ${PATH_TO_MISP}/app

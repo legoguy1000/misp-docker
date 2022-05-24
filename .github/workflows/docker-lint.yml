@@ -4,7 +4,7 @@ on:
   # pull_request:
 jobs:
   misp-lint:
-    name: lint
+    name: Lint MISP Docker Image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 
@@ -12,8 +12,9 @@ jobs:
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: ./misp/Dockerfile
+          ignore: DL3008
   misp-modules-lint:
-    name: lint
+    name: Lint MISP Modules Docker Image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 
