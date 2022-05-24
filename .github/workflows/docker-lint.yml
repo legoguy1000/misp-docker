@@ -1,7 +1,6 @@
-name: docker-lint
+name: Lint container images
 on:
   push:
-  # pull_request:
 jobs:
   misp-lint:
     name: Lint MISP Docker Image

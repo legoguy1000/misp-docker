@@ -1,7 +1,6 @@
-name: docker-build
+name: Build container images
 on:
   push:
-  # pull_request:
 jobs:
   build-misp:
     name: Build MISP Image
@@ -13,8 +12,6 @@ jobs:
         with:
           context: "./misp"
           push: false
-          build-args: |
-            MAXMIND_API_KEY=${{ secrets.MAXMIND_API_KEY }}
   build-misp-modules:
     name: Build MISP Modules Image
     runs-on: ubuntu-latest
