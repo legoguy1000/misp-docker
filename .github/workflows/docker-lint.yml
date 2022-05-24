@@ -7,19 +7,19 @@ jobs:
     name: Lint MISP Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2 
+      - uses: actions/checkout@v3
       - name: Hadolint Action
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: ./misp/Dockerfile
-          ignore: DL3008,DL4006,SC3040
+          ignore: DL3008,DL4006,SC3040,DL3013
   misp-modules-lint:
     name: Lint MISP Modules Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2 
+      - uses: actions/checkout@v3
       - name: Hadolint Action
         uses: hadolint/hadolint-action@v2.0.0
         with:
           dockerfile: ./misp-modules/Dockerfile
-          ignore: DL3008,DL4006,SC3040
+          ignore: DL3008,DL4006,SC3040,DL3013
