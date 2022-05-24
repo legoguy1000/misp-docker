@@ -1,7 +1,8 @@
 name: Build and Publish container images
 on:
-  branches:
-    - main
+  push:
+    branches:
+      - main
 env:
   REGISTRY: ghcr.io
   MISP_VERSION: 2.4.158
