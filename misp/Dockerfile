@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 
 #User Input
-ARG MISP_VERSION=2.4.158
+ARG MISP_VERSION
 ARG MISP_TAG=v${MISP_VERSION}
 
 # Install core components
