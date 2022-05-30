@@ -4,10 +4,12 @@ services:
     depends_on:
       - db
       - redis
-    image: misp:2.4.158
+    image: misp:2.4.159
     build:
       context: misp
       dockerfile: ./Dockerfile
+      args:
+        MISP_VERSION: 2.4.158
     # entrypoint: sleep 5h
     restart: unless-stopped
     ports:
@@ -63,5 +65,8 @@ services:
   #   build:
   #     context: misp-modules
   #     dockerfile: ./Dockerfile
+  #     args:
+  #       MISP_MODULES_VERSION: 2.4.157
+  #       MAXMIND_API_KEY:
   #   restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
   #   stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
