@@ -5,7 +5,7 @@ on:
       - '*'
       - '!main'
 env:
-  MISP_VERSION: 2.4.159
+  MISP_VERSION: 2.4.161
   MISP_MODULES_VERSION: 2.4.157
 jobs:
   build-misp:
