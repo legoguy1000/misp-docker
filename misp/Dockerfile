@@ -60,8 +60,9 @@ RUN ./configure && make && make install && pecl install ssdeep && \
 WORKDIR ${PATH_TO_MISP}/app
 
 # FIX COMPOSER
-RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer && php composer-setup.php && php -r "unlink('composer-setup.php');" && \
-    php composer.phar update &&  php composer.phar config vendor-dir Vendor &&  php composer.phar install --ignore-platform-reqs --no-dev && \
+RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer && php composer-setup.php && mv composer.phar /usr/local/bin/composer && \
+    php -r "unlink('composer-setup.php');" && composer config --no-interaction allow-plugins.composer/installers true && \
+    composer update && composer config vendor-dir Vendor && composer install --ignore-platform-reqs --no-dev && \
     cp -fa ${PATH_TO_MISP}/INSTALL/setup/config.php ${PATH_TO_MISP}/app/Plugin/CakeResque/Config/config.php && \
     cp ${PATH_TO_MISP}/INSTALL/misp.logrotate /etc/logrotate.d/misp
 
@@ -106,7 +107,7 @@ WORKDIR ${PATH_TO_MISP}/app/Config
 RUN tar czpf /tmp/MISPconfig.tgz .
 
 RUN chown -R www-data:www-data ${PATH_TO_MISP} /tmp/MISPconfig.tgz && chmod -R 750 ${PATH_TO_MISP} /tmp/MISPconfig.tgz && \
-    chmod -R g+ws ${PATH_TO_MISP}/app/tmp && chmod -R g+ws ${PATH_TO_MISP}/app/files && chmod -R g+ws ${PATH_TO_MISP}/app/files/scripts/tmp && \    
+    chmod -R g+ws ${PATH_TO_MISP}/app/tmp && chmod -R g+ws ${PATH_TO_MISP}/app/files && chmod -R g+ws ${PATH_TO_MISP}/app/files/scripts/tmp && \
     mkdir -p /run/shibboleth && chown -R www-data:www-data /run/shibboleth /var/log/shibboleth /var/run/shibboleth && \
     chmod -R 775 /run/shibboleth /var/log/shibboleth /var/run/shibboleth
 

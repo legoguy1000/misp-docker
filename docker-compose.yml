@@ -4,7 +4,7 @@ services:
     depends_on:
       - db
       - redis
-    image: misp:2.4.159
+    image: misp:2.4.160
     build:
       context: misp
       dockerfile: ./Dockerfile
