@@ -153,7 +153,7 @@ GPGEOF
 
     if [ ! -z "$ADMIN_PASS" ]; then
         echo "Setting Admin Password"
-        $CAKE Password admin@admin.test "$ADMIN_PASS" -o
+        $CAKE user change_pw --no_password_change admin@admin.test "$ADMIN_PASS"
     fi
     if [ ! -z "$ADMIN_AUTH_KEY" ]; then
         echo "Setting Admin Auth Key"
