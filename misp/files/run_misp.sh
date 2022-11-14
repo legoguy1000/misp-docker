@@ -119,7 +119,7 @@ GPGEOF
     $CAKE Admin setSetting "Security.salt" $(openssl rand -base64 32|tr "/" "-")
     $CAKE Admin setSetting "MISP.tmpdir" "${PATH_TO_MISP}/app/tmp"
     $CAKE Admin setSetting "GnuPG.homedir"  "${PATH_TO_MISP}/.gnupg"
-    # $CAKE Admin setSetting "Security.encryption_key" 
+    # $CAKE Admin setSetting "Security.encryption_key"
     # Change base url, either with this CLI command or in the UI
     [[ ! -z ${MISP_BASEURL} ]] && ${CAKE} Baseurl $MISP_BASEURL
     # The base url of the application (in the format https://www.mymispinstance.com) as visible externally/by other MISPs.
@@ -149,15 +149,26 @@ GPGEOF
         $CAKE Admin setSetting "Plugin.Export_timeout" 300
         $CAKE Admin setSetting "Plugin.Export_services_url" $MISP_MODULES_URL
         $CAKE Admin setSetting "Plugin.Export_services_port" $MISP_MODULES_PORT
+        # Action Services
+        echo "Enabling MISP Modules Action Plugins"
+        $CAKE Admin setSetting "Plugin.Action_services_enable" 1
+        $CAKE Admin setSetting "Plugin.Action_timeout" 300
+        $CAKE Admin setSetting "Plugin.Action_services_url" $MISP_MODULES_URL
+        $CAKE Admin setSetting "Plugin.Action_services_port" $MISP_MODULES_PORT
     fi
 
-    if [ ! -z "$ADMIN_PASS" ]; then
+    LOCAL_ADMIN="${ADMIN_USER:-admin@admin.test}"
+    if [ ! -z "$ADMIN_PASS" ] && [ ! -z "$LOCAL_ADMIN" ]; then
         echo "Setting Admin Password"
-        $CAKE user change_pw --no_password_change admin@admin.test "$ADMIN_PASS"
+        $CAKE user change_pw $LOCAL_ADMIN "$ADMIN_PASS" -no_password_change
     fi
-    if [ ! -z "$ADMIN_AUTH_KEY" ]; then
+    if [ ! -z "$ADMIN_AUTH_KEY" ] && [ ! -z "$LOCAL_ADMIN" ]; then
         echo "Setting Admin Auth Key"
-        $CAKE Authkey admin@admin.test "$ADMIN_AUTH_KEY"
+        $CAKE Authkey $LOCAL_ADMIN "$ADMIN_AUTH_KEY"
+    fi
+    if [ ! -z "$ADMIN_RANDOM_PASS" ] && [ ! -z "$LOCAL_ADMIN" ]; then
+        echo "Setting Admin Password"
+        $CAKE user change_pw $LOCAL_ADMIN "`tr -dc A-Za-z0-9 </dev/urandom | head -c 25; echo ''`" -no_password_change
     fi
 
     # Loop through ENV vars and set individual settings via specially named vars

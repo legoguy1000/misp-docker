@@ -5,8 +5,8 @@ on:
       - main
 env:
   REGISTRY: ghcr.io
-  MISP_VERSION: 2.4.164
-  MISP_MODULES_VERSION: 2.4.163
+  MISP_VERSION: 2.4.165
+  MISP_MODULES_VERSION: 2.4.165
 permissions:
   packages: write
   contents: read

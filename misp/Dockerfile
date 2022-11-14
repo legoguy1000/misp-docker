@@ -92,10 +92,13 @@ RUN sed -i "s|\"sudo -u \"\s*\.\s*\$this->_runtime\['user'\]|\"\"|g" ${PATH_TO_M
 
 # Install templates & stuff
 WORKDIR ${PATH_TO_MISP}/app/files
-RUN rm -rf misp-objects && git clone https://github.com/MISP/misp-objects.git && \
+RUN rm -rf misp-decaying-models && git clone https://github.com/MISP/misp-decaying-models.git && \
     rm -rf misp-galaxy && git clone https://github.com/MISP/misp-galaxy.git && \
-    rm -rf warninglists && git clone https://github.com/MISP/misp-warninglists.git ./warninglists && \
-    rm -rf taxonomies && git clone https://github.com/MISP/misp-taxonomies.git ./taxonomies
+    rm -rf misp-objects && git clone https://github.com/MISP/misp-objects.git && \
+    rm -rf misp-workflow-blueprints && git clone https://github.com/MISP/misp-workflow-blueprints.git ./misp-workflow-blueprints && \
+    rm -rf noticelists && git clone https://github.com/MISP/misp-noticelist.git ./noticelists && \
+    rm -rf taxonomies && git clone https://github.com/MISP/misp-taxonomies.git ./taxonomies && \
+    rm -rf warninglists && git clone https://github.com/MISP/misp-warninglists.git ./warninglists
 
 # Add run script
 # Trigger to perform first boot operations
