@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build and push Docker images
-        uses: docker/build-push-action@v2.10.0
+        uses: docker/build-push-action@v3
         with:
           context: "./misp"
           push: false
@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build and push Docker images
-        uses: docker/build-push-action@v2.10.0
+        uses: docker/build-push-action@v3
         with:
           context: "./misp-modules"
           push: false
