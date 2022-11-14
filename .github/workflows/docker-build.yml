@@ -12,7 +12,7 @@ jobs:
     name: Build MISP Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.10.0
         with:
@@ -24,7 +24,7 @@ jobs:
     name: Build MISP Modules Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.10.0
         with:
