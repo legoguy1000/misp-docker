@@ -4,7 +4,7 @@ services:
     depends_on:
       - db
       - redis
-    image: ghcr.io/legoguy1000/misp:2.4.165
+    image: ghcr.io/legoguy1000/misp:2.4.169
     build:
       context: misp
       dockerfile: ./Dockerfile

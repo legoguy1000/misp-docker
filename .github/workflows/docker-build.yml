@@ -5,8 +5,8 @@ on:
       - '*'
       - '!main'
 env:
-  MISP_VERSION: 2.4.165
-  MISP_MODULES_VERSION: 2.4.165
+  MISP_VERSION: 2.4.169
+  MISP_MODULES_VERSION: 2.4.169
 jobs:
   build-misp:
     name: Build MISP Image
