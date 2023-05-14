@@ -15,7 +15,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     php-mysql php-redis php-gnupg php-xml php-mbstring php-gd php-pear php-opcache php-curl php-readline pkg-config php-bcmath libbson-1.0 libmongoc-1.0-0 \
     python3 python3-dev python3-pip python3-virtualenv libjpeg-dev libxml2-dev libxslt1-dev zlib1g-dev libfuzzy-dev cron logrotate \
     gcc make software-properties-common mariadb-client curl git gnupg-agent openssl zip locales supervisor \
-    libpoppler97 libpoppler-dev libpoppler-cpp-dev g++ && apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/* && \
+    libpoppler97 libpoppler-dev libpoppler-cpp-dev g++ librdkafka-dev && apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/* && \
     a2dismod status && a2dissite 000-default && locale-gen en_US.UTF-8 && phpenmod redis && \
     sed -i \
         -e "s/max_execution_time = 30/max_execution_time = 300/" \
@@ -54,8 +54,10 @@ WORKDIR /tmp
 RUN curl -o ssdeep-2.14.1.tar.gz -L https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
     tar zxvf ssdeep-2.14.1.tar.gz
 WORKDIR  /tmp/ssdeep-2.14.1
-RUN ./configure && make && make install && pecl install ssdeep && \
-    echo 'extension=ssdeep.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini && phpenmod ssdeep && rm -rf /tmp/ssdeep* /tmp/pear
+RUN ./configure && make && make install && pecl install ssdeep simdjson rdkafka && \
+    echo 'extension=ssdeep.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini && phpenmod ssdeep && rm -rf /tmp/ssdeep* /tmp/pear && \
+    echo 'extension=simdjson.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini && \
+    echo 'extension=rdkafka.so' | tee -a /etc/php/7.4/apache2/php.ini /etc/php/7.4/cli/php.ini
 
 WORKDIR ${PATH_TO_MISP}/app
 
@@ -63,6 +65,7 @@ WORKDIR ${PATH_TO_MISP}/app
 RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer && php composer-setup.php && mv composer.phar /usr/local/bin/composer && \
     php -r "unlink('composer-setup.php');" && composer config --no-interaction allow-plugins.composer/installers true && \
     composer update && composer config vendor-dir Vendor && composer install --ignore-platform-reqs --no-dev && \
+    composer require --with-all-dependencies supervisorphp/supervisor:^4.0 guzzlehttp/guzzle php-http/message lstrojny/fxmlrpc elasticsearch/elasticsearch aws/aws-sdk-php && \
     cp -fa ${PATH_TO_MISP}/INSTALL/setup/config.php ${PATH_TO_MISP}/app/Plugin/CakeResque/Config/config.php && \
     cp ${PATH_TO_MISP}/INSTALL/misp.logrotate /etc/logrotate.d/misp
 
