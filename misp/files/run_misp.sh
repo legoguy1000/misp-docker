@@ -160,7 +160,7 @@ GPGEOF
     LOCAL_ADMIN="${ADMIN_USER:-admin@admin.test}"
     if [ ! -z "$ADMIN_PASS" ] && [ ! -z "$LOCAL_ADMIN" ]; then
         echo "Setting Admin Password"
-        $CAKE user change_pw $LOCAL_ADMIN "$ADMIN_PASS" -no_password_change
+        $CAKE user change_pw $LOCAL_ADMIN "$ADMIN_PASS" --no_password_change
     fi
     if [ ! -z "$ADMIN_AUTH_KEY" ] && [ ! -z "$LOCAL_ADMIN" ]; then
         echo "Setting Admin Auth Key"
@@ -168,7 +168,7 @@ GPGEOF
     fi
     if [ ! -z "$ADMIN_RANDOM_PASS" ] && [ ! -z "$LOCAL_ADMIN" ]; then
         echo "Setting Admin Password"
-        $CAKE user change_pw $LOCAL_ADMIN "`tr -dc A-Za-z0-9 </dev/urandom | head -c 25; echo ''`" -no_password_change
+        $CAKE user change_pw $LOCAL_ADMIN "`tr -dc A-Za-z0-9 </dev/urandom | head -c 25; echo ''`" --no_password_change
     fi
 
     # Loop through ENV vars and set individual settings via specially named vars
