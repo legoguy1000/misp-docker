@@ -117,6 +117,14 @@ RUN chown -R www-data:www-data ${PATH_TO_MISP} /tmp/MISPconfig.tgz && chmod -R 7
     mkdir -p /run/shibboleth && chown -R www-data:www-data /run/shibboleth /var/log/shibboleth /var/run/shibboleth && \
     chmod -R 775 /run/shibboleth /var/log/shibboleth /var/run/shibboleth
 
+
+ENV SETTING_Plugin_Enrichment_geoip_country_enabled=true \
+    SETTING_Plugin_Enrichment_geoip_country_local_geolite_db=/misp_modules/geoip/GeoLite2-Country.mmdb \
+    SETTING_Plugin_Enrichment_geoip_city_enabled=true \
+    SETTING_Plugin_Enrichment_geoip_city_local_geolite_db=/misp_modules/geoip/GeoLite2-City.mmdb \
+    SETTING_Plugin_Enrichment_geoip_asn_enabled=true \
+    SETTING_Plugin_Enrichment_geoip_asn_local_geolite_db=/misp_modules/geoip/GeoLite2-ASN.mmdb
+    
 HEALTHCHECK --timeout=15s CMD curl http://localhost:8080/
 VOLUME ${PATH_TO_MISP}/app/Config
 EXPOSE 8080
