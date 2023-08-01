@@ -4,12 +4,12 @@ services:
     depends_on:
       - db
       - redis
-    image: ghcr.io/legoguy1000/misp:2.4.170
+    image: ghcr.io/legoguy1000/misp:2.4.174
     build:
       context: misp
       dockerfile: ./Dockerfile
       args:
-        MISP_VERSION: 2.4.170
+        MISP_VERSION: 2.4.174
     # entrypoint: sleep 5h
     restart: unless-stopped
     ports:
@@ -61,12 +61,12 @@ services:
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
   # misp_modules:
-  #   image: misp-modules:2.4.170
+  #   image: misp-modules:2.4.174
   #   build:
   #     context: misp-modules
   #     dockerfile: ./Dockerfile
   #     args:
-  #       MISP_MODULES_VERSION: 2.4.170
+  #       MISP_MODULES_VERSION: 2.4.174
   #       MAXMIND_API_KEY:
   #   restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
   #   stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
