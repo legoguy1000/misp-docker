@@ -9,7 +9,7 @@ jobs:
     name: Lint MISP Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Hadolint Action
         uses: hadolint/hadolint-action@v2.0.0
         with:
@@ -19,7 +19,7 @@ jobs:
     name: Lint MISP Modules Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Hadolint Action
         uses: hadolint/hadolint-action@v2.0.0
         with:
