@@ -195,6 +195,15 @@ fi
 
 chown www-data:www-data ${PATH_TO_MISP}/app/Config/config.php*
 echo "Starting MISP"
-${PATH_TO_MISP}/app/Console/worker/start.sh
-service shibd start
+
+OLD_WORKERS="${USE_DEPRECATED_WORKERS:-false}"
+if [[ "$OLD_WORKERS" == "true" ]]; then
+    $CAKE Admin setSetting "SimpleBackgroundJobs.enabled" 0
+    ${PATH_TO_MISP}/app/Console/worker/start.sh
+fi
+
+USE_SHIB="${ENABLE_SHIBBOLETH_SSO:-false}"
+if [[ "$USE_SHIB" == "true" ]]; then
+    service shibd start
+fi
 source /etc/apache2/envvars && exec /usr/sbin/apache2 -D FOREGROUND

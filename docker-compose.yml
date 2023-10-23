@@ -4,12 +4,12 @@ services:
     depends_on:
       - db
       - redis
-    image: ghcr.io/legoguy1000/misp:2.4.174
-    build:
-      context: misp
-      dockerfile: ./Dockerfile
-      args:
-        MISP_VERSION: 2.4.174
+    image: misp:2.4.177-test
+    # build:
+    #   context: misp
+    #   dockerfile: ./Dockerfile
+    #   args:
+    #     MISP_VERSION: 2.4.174
     # entrypoint: sleep 5h
     restart: unless-stopped
     ports:
@@ -48,6 +48,38 @@ services:
       - SETTING_Plugin_Enrichment_hover_popover_only=false
       - SETTING_Security_disable_browser_cache=true
       - SETTING_Security_check_sec_fetch_site_header=true
+      - ENABLE_SHIBBOLETH_SSO=false
+      - USE_DEPRECATED_WORKERS=false
+      - SETTING_SimpleBackgroundJobs_supervisor_user=supervisor
+      - SETTING_SimpleBackgroundJobs_supervisor_password=supervisor
+      - RUN_MODE=server
+  workers:
+    depends_on:
+      - db
+      - redis
+      - misp
+    image: misp:2.4.177-test
+    # build:
+    #   context: misp
+    #   dockerfile: ./Dockerfile
+    #   args:
+    #     MISP_VERSION: 2.4.174
+    # entrypoint: sleep 5h
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - /dev/urandom:/dev/random
+      # - ./config/test.php:/tmp/config.external.php:ro
+    # entrypoint: /bin/bash -c "sleep 5h"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=pAyRGUTvaqx?7!gd5Yr#
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RUN_MODE=workers
   db:
     image: mariadb:latest
     restart: unless-stopped

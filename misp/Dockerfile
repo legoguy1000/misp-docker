@@ -65,7 +65,8 @@ WORKDIR ${PATH_TO_MISP}/app
 RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer && php composer-setup.php && mv composer.phar /usr/local/bin/composer && \
     php -r "unlink('composer-setup.php');" && composer config --no-interaction allow-plugins.composer/installers true && \
     composer update && composer config vendor-dir Vendor && composer install --ignore-platform-reqs --no-dev && \
-    composer require --with-all-dependencies supervisorphp/supervisor:^4.0 guzzlehttp/guzzle php-http/message lstrojny/fxmlrpc elasticsearch/elasticsearch aws/aws-sdk-php && \
+    # composer suggests | xargs -i composer require {} && \
+    composer require --with-all-dependencies supervisorphp/supervisor:^4.0 guzzlehttp/guzzle php-http/message php-http/message-factory lstrojny/fxmlrpc elasticsearch/elasticsearch aws/aws-sdk-php && \
     cp -fa ${PATH_TO_MISP}/INSTALL/setup/config.php ${PATH_TO_MISP}/app/Plugin/CakeResque/Config/config.php && \
     cp ${PATH_TO_MISP}/INSTALL/misp.logrotate /etc/logrotate.d/misp
 
@@ -106,7 +107,10 @@ RUN rm -rf misp-decaying-models && git clone https://github.com/MISP/misp-decayi
 # Add run script
 # Trigger to perform first boot operations
 COPY files/run_misp.sh /run_misp.sh
-RUN chmod 0755 /run_misp.sh && touch /tmp/.firstboot.tmp && chown -R www-data:www-data /tmp/.firstboot.tmp /var/log/apache2 /var/run/apache2
+COPY files/run_workers.sh /run_workers.sh
+COPY files/entrypoint.sh /entrypoint.sh
+COPY files/supervisord.conf /etc/supervisor/supervisord.conf
+RUN chmod 0755 /run_misp.sh /run_workers.sh /entrypoint.sh && touch /tmp/.firstboot.tmp && chown -R www-data:www-data /tmp/.firstboot.tmp /var/log/apache2 /var/run/apache2
 
 # Make a backup of /var/www/MISP to restore it to the local moint point at first boot
 WORKDIR ${PATH_TO_MISP}/app/Config
@@ -124,9 +128,9 @@ ENV SETTING_Plugin_Enrichment_geoip_country_enabled=true \
     SETTING_Plugin_Enrichment_geoip_city_local_geolite_db=/misp_modules/geoip/GeoLite2-City.mmdb \
     SETTING_Plugin_Enrichment_geoip_asn_enabled=true \
     SETTING_Plugin_Enrichment_geoip_asn_local_geolite_db=/misp_modules/geoip/GeoLite2-ASN.mmdb
-    
+
 HEALTHCHECK --timeout=15s CMD curl http://localhost:8080/
 VOLUME ${PATH_TO_MISP}/app/Config
 EXPOSE 8080
 USER www-data
-ENTRYPOINT ["/run_misp.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
