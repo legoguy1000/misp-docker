@@ -5,14 +5,14 @@ on:
       - '*'
       - '!main'
 env:
-  MISP_VERSION: 2.4.174
-  MISP_MODULES_VERSION: 2.4.174
+  MISP_VERSION: 2.4.179
+  MISP_MODULES_VERSION: 2.4.179
 jobs:
   build-misp:
     name: Build MISP Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
@@ -24,7 +24,7 @@ jobs:
     name: Build MISP Modules Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
